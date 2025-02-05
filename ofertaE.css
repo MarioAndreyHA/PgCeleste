@@ -219,7 +219,6 @@ footer{
 }
 
 .invitacion{
-    background-image: linear-gradient(to top, #181848b3 100%, rgba(0, 0, 0) 1000%), url('imagenes/FondoTL.jpg');
     background-repeat: no-repeat;
     height: 500px;
     background-position: 0px;
