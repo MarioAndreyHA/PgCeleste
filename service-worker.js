@@ -3,6 +3,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open('cache-v3').then(cache => {
       return cache.addAll([
+        "/",
         "/Index.html",
         "/Contactanos.html",
         "/Oferta_educativa.html",
