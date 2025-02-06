@@ -1,11 +1,11 @@
 self.addEventListener('install', event => {
   console.log('Service Worker instalado');
   event.waitUntil(
-    caches.open('cache-v3').then(cache => {
+    caches.open('cache-v4').then(cache => {
       return cache.addAll([
         "/",
         "/index.html",
-        "/Contactanos.html",
+        "/contactanos.html",
         "/Oferta_educativa.html",
         "/Ubicacion.html",
         "/plan.html",
@@ -14,6 +14,7 @@ self.addEventListener('install', event => {
         "/plan.css",
         "/manifest.json",
         "/app.js",
+        "/offline.html",
         
         "/imagenes/1.jpg",
         "/imagenes/2.jpg",
@@ -53,7 +54,7 @@ self.addEventListener('install', event => {
 
 self.addEventListener("activate", event => {
   console.log('Service worker Activado');
-  const cacheWhitelist = ['cache-v3'];
+  const cacheWhitelist = ['cache-v4'];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -78,3 +79,43 @@ self.addEventListener('fetch', event => {
     }).catch(() => caches.match('/offline.html'))
   );
 });
+
+self.addEventListener("activate", (event) => {
+  console.log("Service Worker Activado");
+  const cacheWhitelist = ["cache-v4"];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!cacheWhitelist.includes(cacheName)) {
+            console.log(`Borrando caché antigua: ${cacheName}`);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  return self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  console.log("Service Worker: Fetch", event.request.url);
+  
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request)
+          .then(networkResponse => {
+            if (!networkResponse || networkResponse.status !== 200) {
+              throw new Error('Error en la respuesta de la red');
+            }
+            return networkResponse;
+          });
+      })
+      .catch(() => caches.match('/offline.html'))
+  );
+});
+
